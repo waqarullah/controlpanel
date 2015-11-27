@@ -1,0 +1,115 @@
+<style type="text/css">
+        .Table {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+            .Table th {
+                text-align: center;
+                font-weight: bold;
+                width: 120px;
+                border-width: 1px;
+                border-style: solid;
+            }
+
+            .Table td {
+            }
+
+        .CollapsibleListHeader {
+            background-color: #EDEADD;
+            height: 20px;
+            color: Black;
+            font-weight: bold;
+        }
+
+        .consoleWindow {
+            font-family: monospace;
+            overflow: auto;
+            height: 300px;
+            width: 95%;
+            margin: 0 auto;
+            background-color: black;
+            color: white;
+            padding: 5px;
+        }
+
+            .consoleWindow .log {
+                color:white;
+                display:block;
+            }
+
+            .consoleWindow .error {
+                color:red;
+                display:block;
+            }
+
+            .consoleWindow .warning {
+                color:yellow;
+                display:block;
+            }
+			#newthreadpanel {
+			
+			display:none;
+
+			}
+    </style>
+   
+    <script src="<currentpath>?script=common.js"></script>
+    <script src="<currentpath>?script=knockout-2.2.1.js"></script>
+    <script src="<currentpath>?script=jquery-1.8.2.min.js"></script>
+    <script src="<currentpath>?script=controlpanel.js"></script>
+
+	<table width="auto" border="1">
+	<tr>
+	<td>
+	Select From Existing Version :
+	</td>
+	<td>
+	<select id="Versions" name="Versions"></select>
+	</td>
+	</tr>
+
+	</table>
+	  
+	<table cellpadding="0" cellspacing="6" border="0" class="Table" width="100%">
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+		 <tbody data-bind = "foreach: vm.systemProcesses">
+            <tr>
+                <th colspan="6" style="background-color: #edeadd; text-align: left; white-space: nowrap;"><img id="online" src="http://i57.tinypic.com/2vwtq8g.png"/><img id="offline" src="http://i58.tinypic.com/20b1fk2.png" style=" margin-bottom: -1px;"/><label data-bind="text:name"></label>
+				<input type="button" onclick="return CreateCopy();" value="Publish" style="float: right;"/>		
+				</th>
+            </tr>
+			</tbody>
+    </table>
+
+	<script>
+	var dat = <jsondata>;
+	 var vm = new viewModel(dat);
+	  $(document).ready(function () {
+            ko.applyBindings(vm);
+			});
+
+
+
+ $(document).ready(function() {
+
+ Common.AjaxCall('<currentpath>/GetAllVersions', 'GET', true, false, null, 'json', 'default', true, fillDropDown, null, null, null, null);
+ });
+
+ function fillDropDown(result){
+		debugger
+		    var html = "<option value='-1'>New Version</option>";
+            result.forEach(function(item) {
+			   html  += "<option value=' '>"+item+"</option>";
+            });			
+			$('#Versions').html(html);
+		};
+
+
+		function CreateCopy(){
+		Common.AjaxCall('<currentpath>/CopyAllFiles', 'GET', true, false, null, 'json', 'default', true, fillDropDown, null, null, null, null);
+		};
+
+		</script>

@@ -1,0 +1,403 @@
+﻿ <style type="text/css">
+        .Table {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+		.ExistingServer
+		{
+		float:left;margin:30px;background-color: green;border-bottom: none !important;border: 2px solid rgb(145, 229, 145);max-width:100px !important;
+		}
+		.NewServer
+		{
+		float:left;margin:30px;background-color: green;border-bottom: none !important;border: 2px solid rgb(145, 229, 145);max-width:100px !important;
+		}
+		.ServerIp
+		{
+		position: absolute;color:white;margin-left: -2px;color:red;
+		}
+    </style>
+	 <h2>Server Performance</h2>
+<div id="cpuGraphss" style="min-width: 310px; height: 350px; margin:10px;display:none "></div>
+<div id="cpuGraph" style="min-width: 310px; height: 300px; margin:10px;width: 650px;"></div>
+<div id="memoryGraph" style="min-width: 310px; height: 300px;  margin:10px;width: 650px;margin-top: -310px;margin-left: 670px;"></div>
+<div id="networkGraph" style="min-width: 310px; margin:10px;overflow: hidden;display: flex;flex-wrap: wrap;"></div>
+
+  
+    <div id="driveInfo" style="overflow:hidden; margin:10px;margin-top:20px !important;"></div>
+
+     <script src="<currentpath>?script=knockout-2.2.1.js"></script>
+     <script src="<currentpath>?script=jquery-1.8.2.min.js"></script>
+	 <script src="<currentpath>?script=common.js"></script>
+	 <script src="<currentpath>?script=highcharts.js"></script>
+	 <script src="<currentpath>?script=serverperformance.js"></script>
+
+       <script type="text/javascript" language="javascript">
+        var lastUpdateDate =  "<threadLastUpdateDate>";
+		var lastdriveUpdateDate="<threadDrivesLastUpdateDate>";
+	
+		 
+        var refreshRate=5000;
+	    var listofServers=ko.observableArray([]);
+		
+		function startDriveUpdate() {
+            setTimeout(function () {
+                Common.postCall('<currentpath>/GetUpdatedSystemPerformanceDrivesStatistic', { ThreadLastUpdateDateStr: lastdriveUpdateDate}, function (data) {
+                    if (data && data.IsSuccess && data.Data) {
+					var temp=[];
+                 
+                        for (var i = 0; i < data.Data.length; i++) {
+						temp.push(data.Data[i]);
+                            addPointToDriveSeries(new Date(data.Data[i].CreationDateStr).getTime(),data.Data[i].IpAddress,data.Data[i].DriveTotalSpace,data.Data[i].DriveSpaceAvailable,data.Data[i].MachineName);
+                            lastdriveUpdateDate = data.Data[i].CreationDateStr;
+                        }
+                    }
+                    startDriveUpdate();
+                }, function (err) {
+                    startDriveUpdate();
+                })
+            }, 5000);
+        }
+
+        function startUpdate() {
+            setTimeout(function () {
+                Common.postCall('<currentpath>/GetUpdatedSystemPerformanceStatistic', { ThreadLastUpdateDateStr: lastUpdateDate}, function (data) {
+                    if (data && data.IsSuccess && data.Data) {
+					var temp=[];
+                 
+                        for (var i = 0; i < data.Data.length; i++) {
+						temp.push(data.Data[i]);
+						      
+							  if(data.Data[i].Cpu<=1)
+							  {
+							  data.Data[i].Cpu=1;
+							  }
+
+                            addPointToSeries(new Date(data.Data[i].CreationDateStr).getTime(),data.Data[i].Cpu,data.Data[i].Memory,data.Data[i].IpAddress,data.Data[i].DriveTotalSpace,data.Data[i].DriveSpaceAvailable,data.Data[i].MachineName);
+                            lastUpdateDate = data.Data[i].CreationDateStr;
+                        }
+                    }
+
+                    startUpdate();
+				
+
+                }, function (err) {
+                    startUpdate();
+                })
+            }, refreshRate);
+        }
+
+		
+        function addPointToSeries(creationDate,cpu,memory,seriesName,totSpace,availableSpace,MachineName)
+        {
+            var flag=false;
+            for(var i=0;i<cpuChart.series.length;i++)
+            {
+			    
+                if(cpuChart.series[i].name==MachineName.replace('\\',''))
+                {
+				var data=[];
+				     
+				 
+                    cpuChart.series[i].setData([cpu],true);
+                    memChart.series[i].setData([memory],true);
+			
+                    //driveCharts[i].chart.series[0].points[0].y=totSpace;
+                    //driveCharts[i].chart.series[0].points[1].y=availableSpace;
+					
+                    flag=true;
+                    break;
+                }
+			
+            }
+			
+            if(!flag)
+            {
+                cpuChart.addSeries({
+                    name: MachineName.replace('\\',''),
+                    data: [{y:cpu}]
+                });
+                memChart.addSeries({
+                    name: MachineName.replace('\\',''),
+                    data: [{y:memory}]
+                });
+
+                //AddDrivePieChart(seriesName, [{
+                  //  x: 'TS',
+                   // y: totSpace
+                //}, {
+                 //   x: 'AS',
+                  //  y: availableSpace
+                //}]);
+            }
+        }
+		
+		
+		  function addPointToDriveSeries(creationDate,seriesName,totSpace,availableSpace,MachineName)
+        {
+            var flag=false;
+            for(var i=0;i<driveCharts.length;i++)
+            {
+			    
+                if(driveCharts[i].ipAddress==MachineName)
+                {
+				var data=[];
+				     data=[{
+                    x: 'TS',
+                    y: totSpace
+                }, {
+                   x: 'AS',
+                    y: availableSpace
+                }];
+    				 driveCharts[i].chart.series[0].setData(data);
+                    
+					
+					
+                    flag=true;
+                    break;
+                }
+			
+            }
+			
+			  for(var j=0;j<drivePieChartData.length;j++)
+                {
+     				
+                    if(drivePieChartData[j].IpAddress==MachineName)
+                    {
+			
+                        drivePieChartData[j].DriveTotalSpace=totSpace;
+                        drivePieChartData[j].DriveSpaceAvailable= availableSpace;
+                        flag=true;
+                        break;
+                    }
+                }
+			
+            if(!flag)
+            {               
+               AddDrivePieChart(MachineName, [{
+                    x: 'TS',
+                    y: totSpace
+                }, {
+                   x: 'AS',
+                    y: availableSpace
+                }]);
+            }
+        }
+
+var networkLastUpdateDate="<threadNetworkLastUpdateDate>";
+function startNetworkUpdate() {
+    setTimeout(function () {
+        Common.postCall('<currentpath>/GetUpdatedSystemPerformanceNetworkStatistic', { ThreadLastUpdateDateStr: networkLastUpdateDate}, function (data) {
+            if (data && data.IsSuccess && data.Data) {
+
+                for (var i = 0; i < data.Data.length; i++) {	      
+                    if(data.Data[i].TotalUsage<=1)
+                    {
+                        data.Data[i].TotalUsage=1;
+                    }
+					
+
+                    addNetworkPointToSeries(new Date(data.Data[i].CreationDateStr).getTime(),data.Data[i].TotalUsage,data.Data[i].IpAddress,data.Data[i].ServerIp,data.Data[i].ServerName);
+                    networkLastUpdateDate = data.Data[i].CreationDateStr;
+                }
+            }
+						
+            startNetworkUpdate();
+        }, function (err) {
+		console.log('Errot');
+		console.log(err);
+            startNetworkUpdate();
+        })
+    }, 5000);
+}
+
+var inc=0;
+function addNetworkPointToSeries(creationDate,TotalUsage,seriesName,id,ServerName)
+{
+
+    var flag=false;
+	
+           for(var i=0;i<netWorkChrts.length;i++)
+            {
+			    
+                if(netWorkChrts[i].id==id)
+                {
+				    var a=0;
+					for(var k=0;k<netWorkChrts[i].chart.series.length;k++)
+					{
+					if(netWorkChrts[i].chart.series[k].name==seriesName.replace('\\',''))
+					{var dat=[]
+					   dat.push({
+                    y: TotalUsage
+                         });
+					netWorkChrts[i].chart.series[k].setData(dat);
+					 a=1;
+					flag=true;
+                    break;
+					}
+					}
+					if(a==0)
+					{
+			netWorkChrts[i].chart.addSeries({
+                    name: seriesName.replace('\\', ''), 
+				id:id,
+				servername:ServerName,
+				data: [{
+                    y: TotalUsage
+                      }]
+                     });
+					 flag=true;
+                    break;
+					}
+    				 
+                    
+                }
+			
+            }
+	inc=inc+1;		
+    if(!flag)
+    {
+        		var fSeries=[];
+					var network=[];
+					network.push({
+                name: seriesName.replace('\\', ''), 
+				id:id,
+				servername:ServerName,
+				data: [{
+                    y: TotalUsage
+                }]
+            });
+					fSeries.push({ id: id, SeriesDistinct: network ,servername:ServerName});
+					InitializeNetworkGraph(fSeries[0]);
+					//netWorkChrts[i].chart.series[k]
+    }
+}
+
+        var cpuSeries =[];
+        var memSeries =[];
+		var networkSeries=[];
+        var drivePieChartData=[];
+		 
+        var dat = <jsondata>;
+        var statistics = dat;
+		var networkDat=<jsonNetworkData>;	
+		var drivesData=<jsondrivesData>;
+		 if(drivesData)
+        {
+
+            for(var i=0;i<drivesData.length;i++)
+            {
+                var flag=false;
+                for(var j=0;j<drivePieChartData.length;j++)
+                {
+     				
+                    if(drivePieChartData[j].IpAddress==drivesData[i].MachineName)
+                    {
+			
+                        drivePieChartData[j].DriveTotalSpace=drivesData[i].DriveTotalSpace;
+                        drivePieChartData[j].DriveSpaceAvailable= drivesData[i].DriveSpaceAvailable;
+                        flag=true;
+                        break;
+                    }
+                }
+            
+                if(!flag)
+                {
+                    
+                    drivePieChartData.push({IpAddress:drivesData[i].MachineName,DriveTotalSpace:drivesData[i].DriveTotalSpace,DriveSpaceAvailable: drivesData[i].DriveSpaceAvailable});
+                }
+                lastdriveUpdateDate = drivesData[i].CreationDateStr;
+            }
+		
+        }
+		
+		
+        if(statistics)
+        {
+
+            for(var i=0;i<statistics.length;i++)
+            {
+                var flag=false;
+                for(var j=0;j<cpuSeries.length;j++)
+                {
+     				
+                    if(cpuSeries[j].name==statistics[i].MachineName.replace('\\',''))
+                    {
+					cpuSeries[j].data=[];
+					memSeries[j].data=[];
+                        cpuSeries[j].data.push({
+                             
+                            y: statistics[i].Cpu
+                        });
+                        memSeries[j].data.push({
+                            
+                            y: statistics[i].Memory
+                        });
+                        //drivePieChartData[j].DriveTotalSpace=statistics[i].DriveTotalSpace;
+                        //drivePieChartData[j].DriveSpaceAvailable= statistics[i].DriveSpaceAvailable;
+                        flag=true;
+                        break;
+                    }
+                }
+            
+                if(!flag)
+                {
+                    cpuSeries.push({name:statistics[i].MachineName.replace('\\',''),data:[{
+                       
+                        y: statistics[i].Cpu
+                    }]});
+					
+                    memSeries.push({name:statistics[i].MachineName.replace('\\',''),data:[{
+                    
+                        y: statistics[i].Memory
+                    }]});
+
+                    //drivePieChartData.push({IpAddress:statistics[i].IpAddress,DriveTotalSpace:statistics[i].DriveTotalSpace,DriveSpaceAvailable: statistics[i].DriveSpaceAvailable});
+                }
+                lastUpdateDate = statistics[i].CreationDateStr;
+            }
+		
+        }
+	if (networkDat) {
+	
+	
+    for (var i = 0; i < networkDat.length; i++) {
+        var flag = false;
+        for (var j = 0; j < networkSeries.length; j++) {
+		if(networkDat[i].TotalUsage<=1)
+		{
+		 networkDat[i].TotalUsage=1;
+		}
+            if (networkSeries[j].name == networkDat[i].IpAddress.replace('\\', '')) {
+			networkSeries[j].data=[];
+            networkSeries[j].data.push({
+                   
+                    y: networkDat[i].TotalUsage
+                });
+                flag = true;
+                break;
+            }
+        }
+
+        if (!flag) {
+		if(networkDat[i].TotalUsage<=1)
+		{
+		networkDat[i].TotalUsage=1;
+		}
+		
+            networkSeries.push({
+                name: networkDat[i].IpAddress.replace('\\', ''), 
+				id:networkDat[i].ServerIp,
+				servername:networkDat[i].ServerName,
+				data: [{
+                    y: networkDat[i].TotalUsage
+                }]
+            });
+        }
+        networkLastUpdateDate = networkDat[i].CreationDateStr;
+    }
+
+}
+    </script>
+
+   

@@ -1,0 +1,8 @@
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Debug\ControlPanel.Core.dll
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Debug\ControlPanel.Core.pdb
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Debug\Spring.Core.dll
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Debug\Validation.dll
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Debug\Spring.Core.pdb
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Debug\Spring.Core.xml
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\obj\Debug\ControlPanel.Core.dll
+I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\obj\Debug\ControlPanel.Core.pdb

@@ -1,0 +1,365 @@
+   
+     <style type="text/css">
+        .Table {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+            .Table th {
+                text-align: center;
+                font-weight: bold;
+                width: 120px;
+                border-width: 1px;
+                border-style: solid;
+            }
+
+            .Table td {
+            }
+
+        .CollapsibleListHeader {
+            background-color: #EDEADD;
+            height: 20px;
+            color: Black;
+            font-weight: bold;
+        }
+
+        .consoleWindow {
+            font-family: monospace;
+            overflow: auto;
+            height: 300px;
+            width: 95%;
+            margin: 0 auto;
+            background-color: black;
+            color: white;
+            padding: 5px;
+        }
+
+            .consoleWindow .log {
+                color:white;
+                display:block;
+            }
+
+            .consoleWindow .error {
+                color:red;
+                display:block;
+            }
+
+            .consoleWindow .warning {
+                color:yellow;
+                display:block;
+            }
+			#newthreadpanel {
+			
+			display:none;
+
+			}
+    </style>
+   
+    <script src="<currentpath>?script=common.js"></script>
+    <script src="<currentpath>?script=knockout-2.2.1.js"></script>
+    <script src="<currentpath>?script=jquery-1.8.2.min.js"></script>
+    <script src="<currentpath>?script=controlpanel.js"></script>
+
+
+
+<form name="Addform" id="Addform">
+<table width="auto" border="1">
+  
+  <tr>
+    <td width="119">System Process : </td>
+    <td width="140"><label for="systemprocess"></label>
+	<!-- ko ifnot:currentThread -->
+	  <select id="systemprocess" name="systemprocess"></select>
+	<!-- /ko -->
+	<!-- ko if:currentThread -->
+	  <select id="systemprocess" name="systemprocess" data-bind="options: systemProcesses,optionsText: 'name',optionsValue:'systemProcessId',value: selectedSystemProcess"></select>
+	<!-- /ko -->
+	<div id="newthreadpanel">
+	
+	<table width="auto" border="1">
+	<tr>
+	<td>
+	Name :
+	</td>
+	<td>
+	<input type="text" name="SysProcessName" id="SysProcessName"/> 
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Description :
+	</td>
+	<td>
+	<input type="text" name="SysProcessDescription" id="SysProcessDescription"/> 
+	</td>
+	</tr>
+	<tr>
+	<td>
+	IP :
+	</td>
+	<td>
+	<input type="text" name="SysProcessIp" id="SysProcessIp"/> 
+	</td>
+	</tr>
+	<tr>
+	<td>
+	Port :
+	</td>
+	<td>
+	<input type="text" name="SysProcessPort" id="SysProcessPort"/> 
+	</td>
+	</tr>
+	</table>
+	</div>
+		  </td>
+  </tr>
+  <tr>
+    <td width="119" >Name : </td>
+    <td width="140"><label for="name"></label>
+	 <!-- ko if:currentThread -->
+         <input type="text" name="ProcessName" id="ProcessName" data-bind="value: currentThread().name" /> 
+	  <!-- /ko -->
+	  <!-- ko ifnot:currentThread -->
+	  <input type="text" name="ProcessName" id="ProcessName"/> 
+	  <!-- /ko -->
+	  </td>
+	
+  </tr>
+  <tr>
+    <td>Spring Entry Name :</td>
+    <td><label for="Spring Entry Name"></label>
+	<!-- ko ifnot:currentThread -->
+      <input type="text" name="SpringEntryName" id="SpringEntryName">
+	  <!-- /ko -->
+
+	  <!-- ko if:currentThread -->
+	  <input type="text" name="SpringEntryName" id="SpringEntryName" data-bind="value: currentThread().springEntryName" /> 
+	  <!-- /ko -->
+	  </td>
+	  
+  </tr>
+  <tr>
+  <td>Description :</td>
+  <td>
+  <!-- ko ifnot: currentThread -->
+  <input type="text" name="Description" id="Description" >
+  <!-- /ko -->
+  
+  <!-- ko if: currentThread -->
+  <input type="text" name="Description" id="Description" data-bind="value: currentThread().description" />
+  <!-- /ko -->
+
+  </td>
+  </tr>
+  <tr>
+  <tr>
+  <td>Continuous :</td>
+  <td>
+  <!-- ko ifnot: currentThread -->
+  <input type="checkbox" name="Continuous" id="Continuous" />
+  <!-- /ko -->
+
+  <!-- ko if: currentThread -->
+  <input type="checkbox" name="Continuous" id="Continuous" data-bind="checked: currentThread().continuous()"/>
+  <!-- /ko -->
+  
+  </td>
+  </tr>
+  <tr>
+  <td>Continuous Delay :</td>
+  <td>
+  <!-- ko if:currentThread -->
+  <input type="text" name="ContinuousDelay" id="ContinuousDelay" data-bind="value: currentThread().continuousDelay()" />
+  <!-- /ko -->
+
+  <!-- ko ifnot:currentThread -->
+  <input type="text" name="ContinuousDelay" id="ContinuousDelay" />
+  <!-- /ko -->
+  </td>
+  </tr>
+
+   <tr>
+  <td>Argument :</td>
+  <td>
+  <!-- ko if:currentThread -->
+  <textarea rows="4" cols="50" name="Argument" id="Argument" data-bind="value: currentThread().argument()"></textarea>
+  <!-- /ko -->
+
+  <!-- ko ifnot:currentThread -->
+  <textarea rows="4" cols="50" name="Argument" id="Argument"></textarea>
+  <!-- /ko -->
+  
+  </td>
+   
+  </tr>
+
+  <tr>
+  <td>Scheduled Time :</td>
+  <td>
+  <!-- ko if:currentThread -->
+  <input type="time" name="ScheduledTime" id="ScheduledTime" data-bind="value: currentThread().displaytime()" />
+  <!-- /ko -->
+  
+  <!-- ko ifnot: currentThread -->
+  <input type="time" name="ScheduledTime" id="ScheduledTime">
+  <!-- /ko -->
+
+  </td>
+   
+  </tr>
+  <tr>
+    <td>&nbsp;
+	<!-- ko if: currentThread -->
+	<input type="hidden" name="hiddenfield" id="hiddenfield" data-bind="value: currentThread().systemProcessThreadId()"/>
+	<!-- /ko -->
+	</td>
+    <td><input type="button" onclick="return senddata();" value="Submit"></td>
+  </tr>
+</table>
+ </form>
+
+ <table cellpadding="0" cellspacing="1" border="0" class="Table" width="100%">
+            <tr class="gridView_header">
+                <th width="180px">Service</th>
+              
+                <th width="80px">Status</th>
+                <th width="50px">Edit</th>
+				<th width="50px">Remove</th>
+                <th width="50px">Scheduled</th>
+            </tr>
+
+			 <tr>
+                <th colspan="6" style="background-color: #edeadd; text-align: left; white-space: nowrap;">&nbsp;&nbsp;<label data-bind="text:name"></label></th>
+            </tr>
+			   <!-- ko foreach: vm.systemProcesses -->
+             <!-- ko foreach: $data.systemProcessThreadList -->
+            <tr>
+                <td>
+                    <label data-bind="text:$data.name"></label>
+                </td>
+               
+                <td>&nbsp;&nbsp; 
+                    <label data-bind="text:$data.status"></label>
+                </td>
+				 <td align="center">
+
+                    <a data-bind="click:$root.setCurrentThread">Edit</a>
+                </td>
+				 <td align="center">
+                    <a data-bind="click:$root.setremovethread">Remove</a>
+                </td>
+               
+                <td style="width: 90px;">
+                    <label data-bind="text:continuousScheduleTime"></label>
+                </td>
+				 </tr>
+            <!-- /ko -->
+            <!-- /ko -->
+			  <!-- /ko -->
+
+        </table>
+
+
+
+ <script>
+
+ $(document).ready(function() {
+
+ Common.AjaxCall('<currentpath>/getallsystemprocessddl', 'GET', true, false, null, 'json', 'default', true, fillDropDown, null, null, null, null);
+ });
+
+ function fillDropDown(result){
+		
+		    var html = "<option value='-1'>New thread</option>";
+            result.forEach(function(item) {
+			   html  += "<option value='"+item.SystemProcessId+"'>"+item.Name+"</option>";
+            });			
+			$('#systemprocess').html(html);
+		};
+
+ function senddata (){
+ var obj = {};
+ obj.SystemProcessId = $('#systemprocess').val();
+ obj.Name = $('#ProcessName').val();
+ obj.Description = $('#Description').val();
+ obj.SpringEntryName = $('#SpringEntryName').val();
+ obj.ScheduledTime = $('#ScheduledTime').val();
+ obj.Continuous = $('#Continuous').val();
+ obj.ContinuousDelay = $('#ContinuousDelay').val();
+ obj.Argument = $('#Argument').val();
+ obj.HiddenField = $('#hiddenfield').val();
+ obj.SystemProcessName = $('#SysProcessName').val();
+ obj.SystemProcessDesc = $('#SysProcessDescription').val();
+ obj.SystemProcessIp = $('#SysProcessIp').val();
+ obj.SystemProcessPort = $('#SysProcessPort').val();
+
+ Common.postCall('<currentpath>/getdata',obj,result,error)
+ };
+
+ function result()
+ {
+ location.reload();
+ };
+
+ function error()
+ {
+ alert("error");
+ }
+
+        var interval = 5000;
+        var dat = <jsondata>;
+        var threadLastUpdateDate = "<threadLastUpdateDate>";
+        var eventLoglastUpdateDate = "<eventLoglastUpdateDate>";
+        debugger
+        var vm = new viewModel(dat);
+
+        $(document).ready(function () {
+	
+            ko.applyBindings(vm);
+            startUpdate();
+        });
+
+
+         function startUpdate() {
+            setTimeout(function () {
+                Common.postCall('<currentpath>/GetUpdatedSystemProcessThreads', { ThreadLastUpdateDateStr: threadLastUpdateDate, EventLogLastUpdateDateStr: eventLoglastUpdateDate }, function (data) {
+                    if (data.Threads) {
+                        vm.updateProcessThreads(data.Threads);
+                        if (data.EventLogs)
+                            for (var i = 0; i < data.EventLogs.length; i++) {
+                              vm.addLog(new EventLog(data.EventLogs[i].Title + " " + data.EventLogs[i].Description, data.EventLogs[i].EventCode));
+                            }
+                    }
+                    threadLastUpdateDate = data.ThreadLastUpdateDateStr;
+                    eventLoglastUpdateDate = data.EventLogLastUpdateDateStr;
+                    startUpdate();
+                }, function (err) {
+                    
+                    startUpdate();
+                })
+            }, interval);
+        }
+
+		$(document).ready(function(){
+		
+		$('#systemprocess').change(function() {
+		var id = $(this).val();
+		if(id == -1){
+		$('#newthreadpanel').slideDown("slow");
+		}
+		else
+		{
+		$('#newthreadpanel').slideUp("slow");
+		}
+		});
+
+		});
+
+		$(document).ready(function(){
+		$('#newthreadpanel').slideDown("slow");
+		});
+
+
+		</script>
+
+ 

@@ -1,0 +1,169 @@
+    <style type="text/css">
+        .Table {
+            border-width: 1px;
+            border-style: solid;
+        }
+
+            .Table th {
+                text-align: center;
+                font-weight: bold;
+                width: 120px;
+                border-width: 1px;
+                border-style: solid;
+            }
+
+            .Table td {
+            }
+
+        .CollapsibleListHeader {
+            background-color: #EDEADD;
+            height: 20px;
+            color: Black;
+            font-weight: bold;
+        }
+
+        .consoleWindow {
+            font-family: monospace;
+            overflow: auto;
+            height: 300px;
+            width: 95%;
+            margin: 0 auto;
+            background-color: black;
+            color: white;
+            padding: 5px;
+        }
+
+            .consoleWindow .log {
+                color:white;
+                display:block;
+            }
+
+            .consoleWindow .error {
+                color:red;
+                display:block;
+            }
+
+            .consoleWindow .warning {
+                color:yellow;
+                display:block;
+            }
+    </style>
+    <div>
+        <table id="tblMain" cellpadding="0" cellspacing="0" border="0" width="100%" align="center" style="border: solid 1px Black;">
+            <tr class="CollapsibleListHeader">
+                <td>
+                    
+                </td>
+            </tr>
+        </table>
+
+		
+
+        <table cellpadding="0" cellspacing="1" border="0" class="Table" width="100%">
+            <tr class="gridView_header">
+                <th width="180px">Service</th>
+                <th>Message</th>
+                <th width="80px">Status</th>
+                <th width="50px">Operation</th>
+                <th width="50px">Continuous</th>
+                <th width="90px">Scheduled</th>
+            </tr>
+			<a href="<currentpath>?action=add">Add</a>
+			<a href="<currentpath>?action=delete">Remove</a>
+            <!-- ko foreach: vm.systemProcesses -->
+            <tr>
+                <th colspan="6" style="background-color: #edeadd; text-align: left; white-space: nowrap;">&nbsp;&nbsp;<label data-bind="text:name"></label></th>
+            </tr>
+            <!-- ko foreach: $data.systemProcessThreadList -->
+            <tr>
+                <td>
+                    <label data-bind="text:name"></label>
+                </td>
+                <td>
+                    <label data-bind="text:message"></label>
+                </td>
+                <td>&nbsp;&nbsp; 
+                    <label data-bind="text:$data.status"></label>
+                </td>
+
+                <td align="center">
+                    <a  data-bind="attr: { href: '<currentpath>?id=' + systemProcessThreadId() + '&opt=enabled', title: enabled },text:enableButtonText"></a>
+               
+                </td>
+                <td align="center">
+                   <a  data-bind="attr: { href: '<currentpath>?id=' + systemProcessThreadId() + '&opt=cont', title: continuous },text:continuousButtonText"></a>
+                  
+                </td>
+                <td style="width: 90px;">
+                    <label data-bind="text:continuousScheduleTime"></label>
+                </td>
+            </tr>
+            <!-- /ko -->
+            <!-- /ko -->
+
+        </table>
+
+
+
+        <table cellpadding="0" cellspacing="3" align="center" width="100%" style="border: solid 1px Black;">
+            <tr>
+                <td>
+
+                    <br />
+                    <div id='divActivity' class="consoleWindow">
+                        <!-- ko foreach: vm.eventLogs -->
+                        <span data-bind="attr:{class:cssClass()},text:message()">
+                        </span>
+                        <!-- /ko -->
+                    </div>
+                    <input type="hidden" id='txtLastActivity' />
+                    <br />
+
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script src="<currentpath>?script=common.js"></script>
+    <script src="<currentpath>?script=knockout-2.2.1.js"></script>
+    <script src="<currentpath>?script=jquery-1.8.2.min.js"></script>
+    <script src="<currentpath>?script=controlpanel.js"></script>
+    
+    <script type="text/javascript" language="javascript">
+        
+        
+        var interval = 5000;
+        var dat = <jsondata>;
+        var threadLastUpdateDate = "<threadLastUpdateDate>";
+        var eventLoglastUpdateDate = "<eventLoglastUpdateDate>";
+        debugger
+        var vm = new viewModel(dat);
+
+        $(document).ready(function () {
+            ko.applyBindings(vm);
+            startUpdate();
+        });
+
+
+         function startUpdate() {
+            setTimeout(function () {
+                Common.postCall('<currentpath>/GetUpdatedSystemProcessThreads', { ThreadLastUpdateDateStr: threadLastUpdateDate, EventLogLastUpdateDateStr: eventLoglastUpdateDate }, function (data) {
+                  
+                    if (data.Threads) {
+                        vm.updateProcessThreads(data.Threads);
+                        if (data.EventLogs)
+                            for (var i = 0; i < data.EventLogs.length; i++) {
+                                vm.addLog(new EventLog(data.EventLogs[i].Title + " " + data.EventLogs[i].Description, data.EventLogs[i].EventCode));
+                            }
+                    }
+                    threadLastUpdateDate = data.ThreadLastUpdateDateStr;
+                    eventLoglastUpdateDate = data.EventLogLastUpdateDateStr;
+                    startUpdate();
+                }, function (err) {
+                    vm.addLog(new EventLog("Error Occurred", EventLogTypes.Error));
+                    startUpdate();
+                })
+            }, interval);
+        }
+       
+        </script>
