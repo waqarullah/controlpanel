@@ -1,9 +1,0 @@
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Release\ControlPanel.Core.dll
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Release\ControlPanel.Core.pdb
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Release\Spring.Core.dll
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Release\Validation.dll
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Release\Spring.Core.pdb
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\bin\Release\Spring.Core.xml
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\obj\Release\ControlPanel.Core.csprojResolveAssemblyReference.cache
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\obj\Release\ControlPanel.Core.dll
-I:\SVN\trunk\Code\Control Panel\ControlPanel.Core\obj\Release\ControlPanel.Core.pdb
